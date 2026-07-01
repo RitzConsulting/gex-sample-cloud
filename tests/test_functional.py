@@ -1,7 +1,7 @@
 """Functional + in-app security tests. Run with: pytest (uses the Flask test
 client, no network needed). These always run in CI."""
 
-from app.config import DEFAULT_DEV_API_KEY
+from app.config import DEFAULT_DEV_API_KEY, DEFAULT_DEV_WEBHOOK_SECRET
 
 
 def test_health(client):
@@ -80,6 +80,48 @@ def test_sql_injection_param_is_safe(client):
     assert r.get_json() == []
 
 
-def test_webhook_validates_input(client):
-    assert client.post("/webhook/tradingview", json={}).status_code == 400
-    assert client.post("/webhook/tradingview", json={"symbol": "SPX"}).status_code == 200
+def test_webhook_requires_secret(client):
+    # No secret / wrong secret → 401 (no unauthenticated write path).
+    assert client.post("/webhook/tradingview", json={"symbol": "SPX"}).status_code == 401
+    assert client.post(
+        "/webhook/tradingview", headers={"X-Webhook-Secret": "nope"}, json={"symbol": "SPX"}
+    ).status_code == 401
+
+
+def test_webhook_accepts_valid_secret(client):
+    h = {"X-Webhook-Secret": DEFAULT_DEV_WEBHOOK_SECRET}
+    assert client.post("/webhook/tradingview", headers=h, json={}).status_code == 400  # missing symbol
+    assert client.post("/webhook/tradingview", headers=h, json={"symbol": "SPX"}).status_code == 200
+    # Secret in the JSON body is also accepted.
+    assert client.post(
+        "/webhook/tradingview", json={"secret": DEFAULT_DEV_WEBHOOK_SECRET, "symbol": "SPX"}
+    ).status_code == 200
+
+
+def test_rate_limiting_on_writes(tmp_path, monkeypatch):
+    monkeypatch.setenv("DB_PATH", str(tmp_path / "rl.db"))
+    from app import create_app
+    from app.security import _limiter
+
+    _limiter._hits.clear()  # isolate from other tests' write requests
+    app = create_app({"RATE_LIMIT_PER_MIN": 3})
+    c = app.test_client()
+    codes = [c.post("/api/sync/push", json={}).status_code for _ in range(6)]
+    assert 429 in codes  # limiter trips before auth is even checked
+
+
+def test_no_secret_leak_in_bodies(client):
+    markers = [
+        "dev-insecure-key-change-me", "dev-only-flask-secret-change-me",
+        "dev-webhook-secret-change-me", "SYNC_API_KEY", "FLASK_SECRET_KEY",
+        "Traceback (most recent call last)", "sqlite3.",
+    ]
+    bodies = [client.get(p).get_data(as_text=True)
+              for p in ["/", "/api/health", "/api/gex/latest", "/api/trade-ideas", "/nope-xyz"]]
+    bodies.append(client.post(
+        "/api/sync/push", headers={"X-Sync-Key": DEFAULT_DEV_API_KEY},
+        json={"table": "'; DROP TABLE x;--", "rows": [{}]},
+    ).get_data(as_text=True))
+    blob = "\n".join(bodies)
+    for m in markers:
+        assert m not in blob

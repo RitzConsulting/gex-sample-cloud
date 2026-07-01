@@ -15,7 +15,11 @@ Your deployment must satisfy **all** of the following:
 | Debug off | Flask debugger disabled; no stack traces returned to clients. |
 | Ingestion requires auth | `POST /api/sync/push` without a valid `X-Sync-Key` is rejected (401/403). |
 | Dev key disabled | The built-in dev key (`dev-insecure-key-change-me`) does **not** authenticate in prod — you set a strong `SYNC_API_KEY` via Secret Manager. |
+| Webhook requires a secret | `POST /webhook/tradingview` without the shared secret is rejected — no unauthenticated write path. |
+| Webhook dev secret disabled | The built-in dev webhook secret does **not** authenticate in prod. |
 | Read-only public surface | Writes to non-ingestion paths return 403. |
+| No secret/debug leak | No response body contains secrets, config, SQL errors, or stack traces. |
+| Rate limiting | Write endpoints are rate-limited (in-app per-IP; edge Cloud Armor recommended — see [HARDENING.md](docs/HARDENING.md)). |
 | Injection-safe | Malicious table/column names never cause a 500. |
 | No exposed files | `/.env`, `/config.py`, `/.git/config`, `/wsgi.py`, … are not served. |
 | CORS locked down | `Access-Control-Allow-Origin` is never `*` and never reflects an arbitrary origin. |

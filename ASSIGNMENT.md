@@ -57,11 +57,14 @@ HTTPS-only practices. The exact acceptance criteria are in
 - Don't add real credentials or real data.
 - Keep the public dashboard read-only; don't open new write paths.
 
+See [docs/HARDENING.md](docs/HARDENING.md) for concrete secret / least-privilege
+/ Cloud Armor examples.
+
 ## Stretch goals (optional, called out in your write-up)
 
-- Rate limiting / basic WaF (Cloud Armor) in front of the service.
-- Structured request logging + a log-based alert on repeated `401/403`.
-- Authenticated webhook (shared secret) — see `app/routes/webhook.py`.
+- **Edge** rate limiting / WAF (Cloud Armor) in front of the service (the app
+  already has a per-instance limiter; the edge one is the real protection).
+- Structured request logging + a log-based alert on repeated `401/403/429`.
 - CI that runs `pytest` on push and blocks deploy on failure.
 - Cloud Run **min-instances** + startup DB restore if you persist SQLite.
 
