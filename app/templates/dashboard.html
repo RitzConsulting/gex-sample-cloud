@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GEX Sample — Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>GEX Sample Cloud</h1>
+    <p class="sub">Dummy data · read-only public dashboard · training sample</p>
+  </header>
+
+  <section class="card">
+    <h2>Latest GEX snapshot</h2>
+    {% if gex %}
+    <ul class="kv">
+      <li><span>Time</span><b>{{ gex['ts'] }}</b></li>
+      <li><span>SPX</span><b>{{ gex['spx_price'] }}</b></li>
+      <li><span>Net GEX</span><b>{{ gex['net_gex'] }}</b></li>
+      <li><span>Regime</span><b>{{ gex['regime'] }}</b></li>
+      <li><span>Put wall</span><b>{{ gex['put_wall'] }}</b></li>
+      <li><span>Call wall</span><b>{{ gex['call_wall'] }}</b></li>
+    </ul>
+    {% else %}
+    <p>No data.</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Recent trade ideas</h2>
+    <table>
+      <thead><tr><th>Time</th><th>Strategy</th><th>Short</th><th>Long</th><th>Credit</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for t in ideas %}
+        <tr>
+          <td>{{ t['ts'] }}</td>
+          <td>{{ t['strategy'] }}</td>
+          <td>{{ t['short_strike'] }}</td>
+          <td>{{ t['long_strike'] }}</td>
+          <td>{{ t['credit'] }}</td>
+          <td>{{ t['status'] }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <footer><p>APIs: <code>/api/gex/latest</code> · <code>/api/trade-ideas</code> · <code>/api/health</code></p></footer>
+</body>
+</html>
