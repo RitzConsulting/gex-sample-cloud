@@ -13,9 +13,11 @@ and none should be added.
 
 ## Your goal
 
-Deploy this service to **Google Cloud Run** such that the remote security suite
-(`tests/test_security.py`) passes **100%** against your live URL, and the
-deployment follows least-privilege, secrets-managed, HTTPS-only practices.
+Deploy this service to **Google Cloud Run** such that QA's black-box security
+suite (a **separate repo, `gex-sample-cloud-tests`**) passes **100%** against
+your live URL, and the deployment follows least-privilege, secrets-managed,
+HTTPS-only practices. The exact acceptance criteria are in
+[SECURITY_TESTS.md](SECURITY_TESTS.md) — nothing is hidden.
 
 ## What you must deliver
 
@@ -37,11 +39,13 @@ deployment follows least-privilege, secrets-managed, HTTPS-only practices.
    - Sensible resource limits and a low max-instance count.
 5. **A short write-up** (`SUBMISSION.md`) covering: your architecture choices,
    the exact deploy steps, how secrets are handled, the least-privilege SA, and
-   the passing test output (`BASE_URL=<your url> pytest tests/test_security.py`).
+   your **live URL** plus evidence you meet the criteria in
+   [SECURITY_TESTS.md](SECURITY_TESTS.md) (e.g. `curl -I` output).
 
 ## What we will do to evaluate
 
-- Point the security suite at your URL and confirm **all tests pass**.
+- Run the separate `gex-sample-cloud-tests` suite against your URL and confirm
+  **all tests pass**.
 - Review your `Dockerfile`, deploy config, and IAM for least privilege.
 - Probe the URL manually (headers, auth, error handling, exposed paths).
 - Confirm no secrets are committed and the dev key is disabled in prod.

@@ -60,11 +60,14 @@ curl -X POST http://127.0.0.1:8080/api/sync/push \
 ## Tests
 
 ```bash
-pytest                                            # functional + in-app security (no network)
-BASE_URL=https://<your-cloud-run-url> pytest tests/test_security.py   # remote suite
+pytest                                            # functional / in-app tests (no network)
 ```
 
-See **[SECURITY_TESTS.md](SECURITY_TESTS.md)** for the security suite details.
+The **black-box security suite lives in a separate repo** — `gex-sample-cloud-tests`
+— and is run by QA against your **deployed URL** (`BASE_URL=… pytest`). You don't
+run it from here. The acceptance criteria (exactly what "secure" is checked for)
+are documented in **[SECURITY_TESTS.md](SECURITY_TESTS.md)** so there are no
+surprises.
 
 ## Security posture (already built in)
 

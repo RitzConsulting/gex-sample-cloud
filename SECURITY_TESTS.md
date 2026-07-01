@@ -1,40 +1,33 @@
-# Security test suite
+# Security acceptance criteria
 
-Two layers:
+The runnable **black-box security suite lives in a separate repo**,
+`gex-sample-cloud-tests`, owned by QA. It is executed against your **deployed
+Cloud Run URL** — you do not need it in this repo. This page documents exactly
+what it checks so you can self-verify before submitting.
 
-- **`tests/test_functional.py`** — runs against the Flask test client (no
-  network). Verifies the app's built-in security behaviour (auth, write-blocking,
-  headers, parameterized SQL). Runs on every `pytest`.
-- **`tests/test_security.py`** — runs against the **deployed URL**. Skipped
-  unless `BASE_URL` is set. This is what the evaluator runs to confirm the live
-  service is secure.
+Your deployment must satisfy **all** of the following:
 
-## Run against a deployed service
+| Criterion | What it means |
+|---|---|
+| HTTPS only | The service is served over TLS (Cloud Run default). |
+| Security headers | `Content-Security-Policy`, `Strict-Transport-Security` (HSTS), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` are present. |
+| No framework banner | The `Server` header does not leak `Werkzeug`/`gunicorn`/`python` versions. |
+| Debug off | Flask debugger disabled; no stack traces returned to clients. |
+| Ingestion requires auth | `POST /api/sync/push` without a valid `X-Sync-Key` is rejected (401/403). |
+| Dev key disabled | The built-in dev key (`dev-insecure-key-change-me`) does **not** authenticate in prod — you set a strong `SYNC_API_KEY` via Secret Manager. |
+| Read-only public surface | Writes to non-ingestion paths return 403. |
+| Injection-safe | Malicious table/column names never cause a 500. |
+| No exposed files | `/.env`, `/config.py`, `/.git/config`, `/wsgi.py`, … are not served. |
+| CORS locked down | `Access-Control-Allow-Origin` is never `*` and never reflects an arbitrary origin. |
+
+The functional behaviour these depend on is already implemented in the app
+(`app/security.py`) — your job is to **preserve it and close the deployment-side
+gaps** (real secrets, TLS, least-privilege SA, debug off). See
+[ASSIGNMENT.md](ASSIGNMENT.md).
+
+QA runs, roughly:
 
 ```bash
-pip install -r requirements-dev.txt
-BASE_URL=https://your-service-xyz-uc.a.run.app pytest tests/test_security.py -v
+# in the gex-sample-cloud-tests repo
+BASE_URL=https://your-service-xyz.a.run.app pytest -v
 ```
-
-All tests must pass.
-
-## What the remote suite checks
-
-| Test | Why it matters |
-|---|---|
-| `test_uses_https` | Service is HTTPS-only |
-| `test_security_headers_present` | CSP, HSTS, `nosniff`, `X-Frame-Options: DENY` |
-| `test_no_framework_banner` | No `Werkzeug`/`gunicorn`/`python` version leak in `Server` |
-| `test_debug_off_no_traceback` | Flask debugger off; no stack traces to clients |
-| `test_sync_requires_key` | Ingestion rejects unauthenticated writes |
-| `test_default_dev_key_is_rejected` | Real secret set via Secret Manager (dev key disabled) |
-| `test_write_blocking_on_read_endpoints` | Public surface is read-only |
-| `test_injection_never_500s` | Malicious table/column names never cause a 500 |
-| `test_no_secret_or_source_files_served` | `/.env`, `/config.py`, `/.git/config`, … not served |
-| `test_cors_not_wildcard_or_reflected` | CORS not `*` and doesn't reflect arbitrary origins |
-
-## Notes
-
-- The suite is intentionally **black-box** — it only needs your URL.
-- A green run is necessary but not sufficient: we also review your IAM, container,
-  and deploy automation. See [ASSIGNMENT.md](ASSIGNMENT.md).
