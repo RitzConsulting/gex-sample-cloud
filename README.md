@@ -5,7 +5,23 @@ the IntelliTrade GEX trading system** — a read-only dashboard backed by SQLite
 an authenticated data-ingestion endpoint, a webhook intake, and a health check.
 
 It exists as a **take-home / training assignment** for the cloud-migration role.
-See **[ASSIGNMENT.md](ASSIGNMENT.md)** for the task.
+
+## 👉 Candidates: what you're expected to do
+
+Full brief in **[ASSIGNMENT.md](ASSIGNMENT.md)**. In short:
+
+1. **Sign up for Google Cloud free tier** (<https://cloud.google.com/free>, ~$0
+   for this exercise) and use **your own** project — you get no access to ours.
+2. **Containerize** this app (write the `Dockerfile`) and **deploy it to Cloud
+   Run** with reproducible automation (`cloudbuild.yaml` or `gcloud`).
+3. **Secure the running service**: secrets via **Secret Manager**, HTTPS/HSTS,
+   debug off, least-privilege service account, read-only public surface. You may
+   (and are encouraged to) **add further tightening** — document it.
+4. **Test it**: run the app locally, then run the black-box security suite
+   ([`gex-sample-cloud-tests`](../gex-sample-cloud-tests)) against your live URL —
+   all checks must pass. Criteria in **[SECURITY_TESTS.md](SECURITY_TESTS.md)**.
+5. **Demonstrate**: share your live `*.run.app` URL, your deploy config, and a
+   short `SUBMISSION.md` write-up.
 
 > ⚠️ Everything here is **dummy data**. There are no real accounts, credentials,
 > broker integrations, or trading logic. Prices, GEX values, and trades are
