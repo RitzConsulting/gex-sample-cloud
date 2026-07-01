@@ -1,7 +1,7 @@
 # gex-sample-cloud
 
 A small, self-contained Flask service that **mimics the cloud-facing surface of
-the IntelliTrade GEX trading system** — a read-only dashboard backed by SQLite,
+a GEX options trading system** — a read-only dashboard backed by SQLite,
 an authenticated data-ingestion endpoint, a webhook intake, and a health check.
 
 It exists as a **take-home / training assignment** for the cloud-migration role.
@@ -32,9 +32,9 @@ Full brief in **[ASSIGNMENT.md](ASSIGNMENT.md)**. In short:
 | Included (representative) | Omitted (not needed to test cloud security) |
 |---|---|
 | Flask app + read-only dashboard | Real strategy / GEX math |
-| SQLite storage + seed data | Broker execution (Tradier/IBKR/Tasty) |
+| SQLite storage + seed data | Broker execution (live brokers) |
 | Authenticated sync ingestion (`/api/sync/push`) | Real account creation / credentials |
-| Webhook intake (`/webhook/tradingview`) | The full 18-agent scheduler |
+| Webhook intake (`/webhook/tradingview`) | The full multi-strategy scheduler |
 | Health check, write-blocking, security headers | Cloud sync worker internals |
 | Secrets via environment (Secret Manager in prod) | — |
 

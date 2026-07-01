@@ -2,8 +2,8 @@
 
 ## Context
 
-This repository is a slimmed-down stand-in for the cloud-facing part of our GEX
-trading platform. The application code is written to a reasonable security
+This repository is a slimmed-down stand-in for the cloud-facing part of a GEX
+options trading platform. The application code is written to a reasonable security
 baseline **on purpose** — your task is **not** to find bugs in the app, but to
 **containerize it, deploy it to Google Cloud, and make the running service
 secure**, then prove it by passing the provided security test suite.
