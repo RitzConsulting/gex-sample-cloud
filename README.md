@@ -39,6 +39,15 @@ client / TradingView ──▶  Flask service (this repo)  ──▶  SQLite (du
 
 ## Run locally
 
+**Quickest (one command):**
+- Windows: double-click **`start.cmd`** (or `./start.ps1`)
+- macOS/Linux: **`./start.sh`**
+
+It creates a virtualenv, installs deps, starts the app, and opens the dashboard
+at http://127.0.0.1:8080. Run the tests with `test.ps1` (Windows) or `pytest`.
+
+**Manual:**
+
 ```bash
 python -m venv .venv && . .venv/bin/activate      # (Windows: .venv\Scripts\activate)
 pip install -r requirements-dev.txt
