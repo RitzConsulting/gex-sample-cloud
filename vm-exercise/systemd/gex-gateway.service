@@ -1,0 +1,18 @@
+# EXAMPLE unit — adapt paths/user. Supervises the flaky gateway (IB Gateway analog).
+[Unit]
+Description=GEX VM sample - flaky gateway stub (IB Gateway analog)
+After=network.target
+
+[Service]
+Type=simple
+User=gexvm
+WorkingDirectory=/opt/gex-sample-vm/service
+# In production, inject the token from Secret Manager (e.g. an EnvironmentFile
+# rendered at boot), NOT a literal here.
+Environment=GATEWAY_TOKEN=REPLACE_FROM_SECRET_MANAGER
+ExecStart=/opt/gex-sample-vm/.venv/bin/python gateway_stub.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
