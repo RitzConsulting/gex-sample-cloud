@@ -23,6 +23,10 @@ Full brief in **[ASSIGNMENT.md](ASSIGNMENT.md)**. In short:
 5. **Demonstrate**: share your live `*.run.app` URL, your deploy config, and a
    short `SUBMISSION.md` write-up.
 
+**Round 2** (after Round 1 passes): **[ROUND2.md](ROUND2.md)** adds the
+production-shaped work — durable **persistence across deploys**, auto-deploy with
+immutable tags, rollback, edge WAF (Cloud Armor), and observability.
+
 > ⚠️ Everything here is **dummy data**. There are no real accounts, credentials,
 > broker integrations, or trading logic. Prices, GEX values, and trades are
 > randomly generated. Nothing confidential is included.

@@ -125,3 +125,39 @@ def test_no_secret_leak_in_bodies(client):
     blob = "\n".join(bodies)
     for m in markers:
         assert m not in blob
+
+
+# Broader injection coverage (merged from candidate review): values that would
+# be dangerous if ever string-formatted into SQL must be inert and never 500.
+INJECTION_PAYLOADS = [
+    "' OR 1=1 --",
+    "'; DROP TABLE trade_ideas; --",
+    "' UNION SELECT NULL,NULL --",
+    "admin'--",
+]
+
+
+def test_injection_payloads_are_inert(client):
+    for p in INJECTION_PAYLOADS:
+        r = client.post(
+            "/api/sync/push", headers={"X-Sync-Key": DEFAULT_DEV_API_KEY},
+            json={"table": "trade_ideas", "rows": [{
+                "ts": "t", "strategy": p, "short_strike": 1,
+                "long_strike": 2, "credit": 1, "status": "open"}]},
+        )
+        assert r.status_code == 200  # stored as a literal, no injection
+    # The table survived and the API still works.
+    assert client.get("/api/trade-ideas").status_code == 200
+
+
+def test_dashboard_escapes_xss(client):
+    xss = "<script>alert(1)</script>"
+    client.post(
+        "/api/sync/push", headers={"X-Sync-Key": DEFAULT_DEV_API_KEY},
+        json={"table": "trade_ideas", "rows": [{
+            "ts": "2026-01-01", "strategy": xss, "short_strike": 1,
+            "long_strike": 2, "credit": 1, "status": "open"}]},
+    )
+    html = client.get("/").get_data(as_text=True)
+    assert xss not in html            # never rendered raw
+    assert "&lt;script&gt;" in html   # HTML-escaped on output
