@@ -5,7 +5,12 @@ for the cloud-migration role. Where `gex-sample-cloud` rehearsed serverless
 (Cloud Run + secrets + IAM), this one rehearses the **single-VM / stateful /
 long-lived-broker-gateway** skills that **Path A** of the real migration needs.
 
-See **[ASSIGNMENT.md](ASSIGNMENT.md)** for the task.
+Two stages:
+- **[ASSIGNMENT.md](ASSIGNMENT.md)** — Stage 1: one hardened VM (systemd, persistent
+  disk, supervise the flaky gateway, alerting).
+- **[ASSIGNMENT_STAGE2.md](ASSIGNMENT_STAGE2.md)** — Stage 2: split across **two
+  VMs** with **private-only** networking (gateway on its own VM, firewalled to the
+  engine — the "IB Gateway on its own VM, private-IP to the engine" pattern).
 
 > Dummy data only. `gateway_stub.py` imitates **IB Gateway's** flakiness
 > (periodic re-auth outages + a token); `worker.py` imitates the stateful trading

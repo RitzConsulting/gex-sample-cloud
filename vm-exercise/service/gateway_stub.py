@@ -16,6 +16,10 @@ from flask import Flask, abort, jsonify, request
 
 TOKEN = os.environ.get("GATEWAY_TOKEN", "dev-gateway-token-change-me")
 PORT = int(os.environ.get("GATEWAY_PORT", "8071"))
+# Stage 1 (single VM): keep 127.0.0.1. Stage 2 (two VMs): set GATEWAY_HOST=0.0.0.0
+# so the engine VM reaches it over the PRIVATE VPC IP — and rely on a VPC firewall
+# that allows ONLY the engine VM. Never open this port to 0.0.0.0/0.
+HOST = os.environ.get("GATEWAY_HOST", "127.0.0.1")
 
 app = Flask(__name__)
 _start = time.time()
@@ -38,4 +42,4 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=PORT)
+    app.run(host=HOST, port=PORT)
