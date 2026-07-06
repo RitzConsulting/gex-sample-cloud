@@ -27,6 +27,11 @@ Full brief in **[ASSIGNMENT.md](ASSIGNMENT.md)**. In short:
 production-shaped work — durable **persistence across deploys**, auto-deploy with
 immutable tags, rollback, edge WAF (Cloud Armor), and observability.
 
+**VM readiness (Path A):** **[vm-exercise/](vm-exercise/)** rehearses a single
+hardened GCE VM running a **stateful worker** + a **flaky IB-Gateway-analog** —
+`systemd` supervision, a persistent disk that survives reboot, Secret Manager,
+firewall/TLS, and a "gateway down too long" alert.
+
 > ⚠️ Everything here is **dummy data**. There are no real accounts, credentials,
 > broker integrations, or trading logic. Prices, GEX values, and trades are
 > randomly generated. Nothing confidential is included.
