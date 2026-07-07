@@ -97,7 +97,9 @@ are structured.
 
 1. **Persistence (automated):** we run `round2/persistence_probe.py seed` with a
    marker → **you redeploy** → we run `... verify` and confirm the marker
-   survived. (See the tests repo `round2/README.md`.)
+   survived. **The same probe is included here at
+   [`round2/persistence_probe.py`](round2/persistence_probe.py)** — self-check
+   with it before submitting (usage is in the file header).
 2. **Security regression:** the full 14-check suite must **still pass** on the new
    (stateful, LB-fronted) deployment.
 3. **Review:** we inspect your CI/CD trigger, SHA tagging, rollback doc, Cloud
